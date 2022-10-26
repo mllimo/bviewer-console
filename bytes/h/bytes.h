@@ -27,6 +27,12 @@ public:
 	const_iterator cend();
 
 	friend std::ostream& operator<<(std::ostream& os, const Bytes& bytes);
+
+	template <class InputIt>
+	void Insert(iterator pos, InputIt first, InputIt last) {
+		data_.insert(pos, first, last);
+	}
+
 private:
 	std::vector<Byte> data_;
 };
