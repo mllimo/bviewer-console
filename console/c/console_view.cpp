@@ -1,6 +1,7 @@
-#include <program/h/console_view.h>
+#include <console/h/console_view.h>
 
 #include <iomanip>
+#include <iterator>
 
 ConsoleViewer::ConsoleViewer(size_t row_size) : row_size_(row_size) {}
 
@@ -12,10 +13,13 @@ void ConsoleViewer::Run(const std::string& path) {
 	// init_byte_pos   __ __ __ __ n_bytes   ...TEXT...
 	size_t current_pos = 0x0;
 	while (current_pos < bytes.Size()) {
+		// init_byte_pos
 		std::cout << std::setfill('0') << std::setw(7) << std::hex << current_pos;
 		std::cout << "   ";
 		size_t i;
 		size_t printed = 0;
+
+		// __ __ __ __ n_bytes
 		for (i = current_pos; i < bytes.Size() && i < current_pos + row_size_; ++i) {
 			std::cout << std::setfill('0') << std::setw(2) << bytes[i] << (i != current_pos + row_size_ - 1 ? " " : "");
 			printed += 1;
@@ -28,9 +32,10 @@ void ConsoleViewer::Run(const std::string& path) {
 			}
 		}
 
+		// ...TEXT...
 		std::cout << "   ";
 		for (i = current_pos; i < bytes.Size() && i < current_pos + row_size_; ++i) {
-			std::cout << (bytes[i] == 0x0 ? '.' : (char)bytes[i]);
+			std::cout << (!isprint((char)bytes[i]) || ispunct((char)bytes[i]) || isblank((char)bytes[i]) ? '.' : (char)bytes[i]);
 		}
 		std::cout << '\n';
 		current_pos += row_size_;
@@ -38,8 +43,6 @@ void ConsoleViewer::Run(const std::string& path) {
 }
 
 Bytes ConsoleViewer::LoadFileToHeap(std::ifstream& file) {
-	// Stop eating new lines in binary mode!!!
-	//file.unsetf(std::ios::skipws);
 
 	// get its size:
 	std::streampos fileSize;
@@ -52,8 +55,8 @@ Bytes ConsoleViewer::LoadFileToHeap(std::ifstream& file) {
 
 	// read the data:
 	vec.Insert(vec.begin(),
-		std::istream_iterator<uint8_t>(file),
-		std::istream_iterator<uint8_t>());
+		std::istreambuf_iterator<char>(file),
+		std::istreambuf_iterator<char>());
 
 	return vec;
 }

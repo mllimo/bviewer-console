@@ -8,10 +8,17 @@
 #include <iomanip>
 
 #include <bytes/h/bytes.h>
-#include <program/h/console_view.h>
+#include <console/h/console_view.h>
+#include <string>
 
 int main(int argc, const char* argv[]) {
-	ConsoleViewer program(16);
+	size_t size = 16;
+	
+	if (argc == 3) {
+		size = stoi(std::string(argv[2]));
+	} 
+
+	ConsoleViewer program(size);
 	program.Run(argv[1]);
 	return 0;
 }
